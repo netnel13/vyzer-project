@@ -1,5 +1,5 @@
-import axios from 'axios'
 import React, { useEffect } from 'react'
+import axios from 'axios'
 import { REACT_APP_SERVER_URL } from '../../config/config'
 import { useGame } from '../../hooks/useGame'
 import { GameStage, IGame, Pages } from '../../types'
@@ -12,6 +12,7 @@ export default function LobbyPage({ setPage }: LobbyPageProps) {
 
     const game = useGame()
 
+    // start the game, after the Admin clicked the button
     const startGame = async () => {
         await axios.patch<IGame>(`${REACT_APP_SERVER_URL}/game/update`, {
             id: game._id,
@@ -21,8 +22,11 @@ export default function LobbyPage({ setPage }: LobbyPageProps) {
         setPage(2)
     }
 
+    // poll data from server
     const getNewData = async () => {
+        // console.log('polling');
         const res = await axios.get<IGame>(`${REACT_APP_SERVER_URL}/game/${game._id}`);
+        // check if game has started
         game.setAll({
             scores: res.data.scores,
             gameStage: res.data.gameStage
@@ -32,15 +36,17 @@ export default function LobbyPage({ setPage }: LobbyPageProps) {
         }
     };
 
+    // poll data from db every 300 seconds
     useEffect(() => {
-        const timer = setInterval(getNewData, 300);
+        // console.log('polling');
+        const timer = setInterval(getNewData, 1000);
         return () => clearInterval(timer);
     });
 
     return (
         <div>
             <div>
-                Players:
+                <h2>Players:</h2>
                 {game.scores.map(score => (
                     <h3 key={score._id}>
                         {score.player.name}

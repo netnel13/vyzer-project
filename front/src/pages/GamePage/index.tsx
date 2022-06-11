@@ -3,7 +3,7 @@ import axios from 'axios'
 import randomWords from 'random-words'
 import { REACT_APP_SERVER_URL } from '../../config/config'
 import { useGame } from '../../hooks/useGame'
-import { Difficulty, IGame, Pages, Word, WordValue } from '../../types'
+import { Difficulty, GameStage, IGame, Pages, Word, WordValue } from '../../types'
 
 interface GamePropsProps {
     setPage: React.Dispatch<React.SetStateAction<Pages>>
@@ -14,6 +14,7 @@ export default function GamePage({ setPage }: GamePropsProps) {
     const game = useGame()
     const [words, setWords] = useState<Word[]>([])
 
+    // create words in first render to choose from
     useEffect(() => {
         const easy = randomWords({ exactly: 1, maxLength: 3, wordsPerString: 1 })[0]
         const medium = randomWords({ exactly: 1, maxLength: 5, wordsPerString: 1 })[0]
@@ -34,22 +35,32 @@ export default function GamePage({ setPage }: GamePropsProps) {
         ])
     }, [])
 
+
+    // polling data from server
     const getNewData = async () => {
         const res = await axios.get<IGame>(`${REACT_APP_SERVER_URL}/game/${game._id}`);
-        if (game.word !== res.data.word) {
-            game.setWord(res.data.word)
-            setPage(3)
+        // check if game has ended - current fix for game not ending properly in drawing page
+        if (game.gameStage !== GameStage.PLAY || res.data.gameStage !== GameStage.PLAY) {
+            setPage(4)
+            return
+        }
+        // check if a word has been chosen
+        if (game.currentPlayer?._id !== game.me?._id) {
+            if (game.word.word !== res.data.word.word && res.data.gameStage === GameStage.PLAY) {
+                game.setWord(res.data.word)
+                setPage(3)
+            }
         }
     };
 
+    // polling data from server every 300 mill
     useEffect(() => {
-        if (game.currentPlayer?._id !== game.me?._id) {
-            const timer = setInterval(getNewData, 300);
-            return () => clearInterval(timer);
-        }
+        const timer = setInterval(getNewData, 300);
+        return () => clearInterval(timer);
     });
 
-    const getDifficulty = (value: WordValue) : Difficulty => {
+    // show each word's difficulty 
+    const getDifficulty = (value: WordValue): Difficulty => {
         switch (value) {
             case 1:
                 return 'easy'
@@ -62,6 +73,7 @@ export default function GamePage({ setPage }: GamePropsProps) {
         }
     }
 
+    // only render if words have been chosen
     if (words.length > 0) {
         return (
             <>
@@ -84,13 +96,19 @@ export default function GamePage({ setPage }: GamePropsProps) {
                                 <button key={`${word.word}-${word.value}`} onClick={() => {
                                     axios.patch(`${REACT_APP_SERVER_URL}/game/update`, {
                                         id: game._id,
-                                        word
+                                        word: {
+                                            word: word.word,
+                                            value: word.value
+                                        }
                                     })
-                                    game.setWord(word)
+                                    game.setWord({
+                                        word: word.word,
+                                        value: word.value
+                                    })
                                     setPage(3)
                                 }}>
                                     {word.word}
-                                    {getDifficulty(word.value)}
+                                    ({getDifficulty(word.value)})
                                 </button>
                             ))}
                         </div>

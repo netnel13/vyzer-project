@@ -8,7 +8,7 @@ export interface Word {
 export const WordSchema = new mongoose.Schema<Word>({
     word: {
         type: String,
-        required: true
+        default: ''
     },
     value: {
         type: Number,

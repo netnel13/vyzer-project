@@ -17,7 +17,9 @@ export interface IGame {
     board: string | null;
     currentPlayer: Types.ObjectId | null;
     gameStage: GameStage,
-    time: number
+    time: number,
+    combinedScores: number
+    createdAt: string
 }
 
 export const GameSchema = new mongoose.Schema<IGame>({
@@ -51,6 +53,10 @@ export const GameSchema = new mongoose.Schema<IGame>({
         default: GameStage.LOBBY
     },
     time: {
+        type: Number,
+        default: 0
+    },
+    combinedScores: {
         type: Number,
         default: 0
     }

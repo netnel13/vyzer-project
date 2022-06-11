@@ -20,6 +20,9 @@ const main = async () => {
         next()
     })
     app.use(router)
+    app.get('*', function(req, res){
+        console.log('404')
+      });
 
     app.listen(PORT, () => {
         console.log(`server is running at http://localhost:${PORT}`);

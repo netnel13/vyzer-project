@@ -1,8 +1,8 @@
 # Tasks
-* test word difficultiy
-* end game lobby
-* design
+* test word difficultiy - V
+* end game lobby - V
 * adjust to mobile
+* css
 * clean code
 
 # Maybe
