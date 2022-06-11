@@ -1,13 +1,15 @@
-# Tasks
-* test word difficultiy - V
-* end game lobby - V
-* adjust to mobile
-* css
-* clean code
+# How to start
 
-# Maybe
-* sockets
-* show best game and add time to finish for game
-* Joi
-* use health check
-* incoming drawing
+## Server
+```
+cd server
+npm install
+npm run dev
+```
+
+## front
+```
+cd front
+npm install
+npm start
+```
