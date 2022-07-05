@@ -1,0 +1,10 @@
+# Tasks
+* test word difficultiy - V
+* end game lobby - V
+* adjust to mobile - V
+
+# Maybe
+* show best game and add time to finish for game - V
+* sockets
+* Joi
+* incoming drawing
